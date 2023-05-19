@@ -51,7 +51,7 @@ public class SearchFileService implements Runnable{
         }
         if (foundFiles.size() == 0) {
             System.out.println("Ничего больше не найдено!");
-            if(foundFiles.size() != 0) {
+            if(allFiles.size() != 0) {
                 ServerSendFiles serverSendFiles = new ServerSendFiles(foundFiles);
                 Thread newThread = new Thread(serverSendFiles);
                 newThread.start();
