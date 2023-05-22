@@ -8,45 +8,29 @@ public class ZipConverter {
 
     private static final int BUFFER = 80000;
 
-    public ZipOutputStream zip(List<File> files, String zipFileName) {
-        ZipOutputStream out = null;
+    public FileOutputStream zip(List<File> files, String zipFileName) {
         try {
-            out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipFileName)));
-            byte data[] = new byte[BUFFER];
-            for (File file : files) {
-                processFile(out, data, file);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            close(out);
-        }
-        return out;
-    }
 
-    private void processFile(ZipOutputStream out, byte[] data, File file) {
-        BufferedInputStream origin = null;
-        try {
-            origin = new BufferedInputStream(new FileInputStream(file), BUFFER);
-            ZipEntry entry = new ZipEntry(file.toString());
-            out.putNextEntry(entry);
-            int count;
-            while ((count = origin.read(data, 0, BUFFER)) != -1) {
-                out.write(data, 0, count);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            close(origin);
-        }
-    }
+            FileOutputStream fos = new FileOutputStream(zipFileName);
+            ZipOutputStream zipOut = new ZipOutputStream(fos);
+            for (File srcFile : files) {
+                FileInputStream fis = new FileInputStream(srcFile);
+                ZipEntry zipEntry = new ZipEntry(srcFile.getName());
+                zipOut.putNextEntry(zipEntry);
 
-    private void close(Closeable closeable) {
-        if (null != closeable) {
-            try {
-                closeable.close();
-            } catch (IOException ignored) {
+                byte[] bytes = new byte[4 * 1024];
+                int length;
+                while ((length = fis.read(bytes)) >= 0) {
+                    zipOut.write(bytes, 0, length);
+                }
+                fis.close();
             }
+            zipOut.close();
+            fos.close();
+            return fos;
+        } catch (IOException exception) {
+
         }
+        return null;
     }
 }
